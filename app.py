@@ -5,7 +5,7 @@ import numpy as np
 app = Flask(__name__)
 
 # Charger le modèle
-model = pickle.load(open("model/best_model.pkl", "rb"))
+model = pickle.load(open("app/model/best_model.pkl", "rb"))
 
 @app.route("/", methods=["GET"])
 def home():
