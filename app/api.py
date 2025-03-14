@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify
 from utils import preprocess_input
 
 # Charger le modèle entraîné
-with open("app/model/best_model.pkl", "rb") as model_file:
+with open("credit_scoring_api/app/model/best_model.pkl", "rb") as model_file:
     model = pickle.load(model_file)
 
 # Initialiser l'application Flask
