@@ -5,7 +5,6 @@ import pandas as pd
 st.title(" Scoring Crédit - Prédiction Client")
 
 API_URL = "https://credit-scoring-api-s00s.onrender.com/predict"
-DATA_URL = "https://credit-scoring-api-s00s.onrender.com/client_data"  # À adapter selon ton backend
 
 st.sidebar.header("Paramètres du client")
 
@@ -14,29 +13,39 @@ client_type = st.sidebar.radio("Sélectionnez le type de client :", ["Client exi
 
 # Si client existant, charger les IDs et infos associées
 if client_type == "Client existant":
-    # Récupérer la liste des clients existants via l'API
+    DATA_URL = "https://nrdnsniperbot.site/application_train.csv"
+
     try:
-        client_data_response = requests.get(DATA_URL)
-        if client_data_response.status_code == 200:
-            client_df = pd.DataFrame(client_data_response.json())
-            client_ids = client_df["SK_ID_CURR"].tolist()
-            selected_id = st.sidebar.selectbox("Choisissez un ID client :", client_ids)
+        client_df = pd.read_csv(DATA_URL)
+        client_ids = client_df["SK_ID_CURR"].tolist()
+        selected_id = st.sidebar.selectbox("Choisissez un ID client :", client_ids)
 
-            selected_client = client_df[client_df["SK_ID_CURR"] == selected_id].iloc[0]
+        selected_client = client_df[client_df["SK_ID_CURR"] == selected_id].iloc[0]
 
-            # Afficher les informations du client sélectionné
-            st.subheader(f" Informations du client #{selected_id}")
-            st.json(selected_client.to_dict())
+        # Affichage des infos du client
+        st.subheader(f" Informations du client #{selected_id}")
+        st.json(selected_client.to_dict())
 
-            # Format des données pour l'API
-            data = selected_client.drop(labels=["SK_ID_CURR"]).to_dict()
+        # Préparation des features attendues par l’API
+        # À adapter selon ce que ton API attend exactement :
+        data = selected_client[[
+            "APP_CODE_GENDER",
+            "APP_FLAG_OWN_CAR",
+            "APP_FLAG_OWN_REALTY",
+            "APP_AMT_INCOME_TOTAL",
+            "APP_AMT_CREDIT",
+            "APP_NAME_EDUCATION_TYPE",
+            "APP_NAME_INCOME_TYPE",
+            "APP_NAME_FAMILY_STATUS",
+            "APP_HOUSETYPE_MODE",
+            "APP_EXT_SOURCE_2",
+            "APP_EXT_SOURCE_3"
+        ]].to_dict()
 
-        else:
-            st.error("Impossible de charger les données clients.")
-            data = None
     except Exception as e:
-        st.error(f"Erreur : {e}")
+        st.error(f"Erreur lors du chargement des données clients : {e}")
         data = None
+
 
 # Si nouveau client, saisir manuellement les données
 else:
